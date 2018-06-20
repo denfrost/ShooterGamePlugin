@@ -46,20 +46,12 @@
 *.VC.opendb
 *.target
 
-# Precompiled Assets
-SourceArt/**/*.png
-SourceArt/**/*.tga
-*_BuiltData.uasset
-
 # Binary Files
 !Binaries/*/*.dll
-Binaries/*/*-DebugGame.dll
-Binaries/*/*-DebugGame.modules
-
-#!UE4Editor.modules
 
 # Builds
 Build/*
+*_BuiltData.uasset
 
 # Don't ignore icon files in Build
 !Build/**/*.ico
