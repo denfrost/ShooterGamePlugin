@@ -12,6 +12,8 @@ class AShooterCharacter : public ACharacter
 	GENERATED_UCLASS_BODY()
 
 	virtual void BeginDestroy() override;
+	
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	/** spawn inventory, setup initial variables */
 	virtual void PostInitializeComponents() override;
@@ -128,7 +130,17 @@ class AShooterCharacter : public ACharacter
 
 	/** setup pawn specific input handlers */
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+	
+	/** get targeting state */
+	UFUNCTION(BlueprintCallable, Category = "Game|Animation")
+	bool IsCrouching() const;
 
+	/**
+	 * Toggle Crouch/Uncrouch
+	 */
+	void OnStartCrouching();
+	
+	void SetUnCrouch();
 	/**
 	* Move forward/back
 	*
@@ -257,10 +269,10 @@ class AShooterCharacter : public ACharacter
 
 	/** Update the team color of all player meshes. */
 	void UpdateTeamColorsAllMIDs();
-private:
 
+private:
 	/** pawn mesh: 1st person view */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	UPROPERTY(EditDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* Mesh1P;
 protected:
 

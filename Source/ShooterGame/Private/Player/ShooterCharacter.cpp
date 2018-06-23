@@ -27,6 +27,12 @@ FAutoConsoleVariableRef CVarNetEnablePauseRelevancy(
 	TEXT("0: Disable, 1: Enable"),
 	ECVF_Cheat);
 
+void AShooterCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EEndPlayReason::Destroyed);
+	SetUnCrouch();
+}
+
 AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UShooterCharacterMovement>(ACharacter::CharacterMovementComponentName))
 {
@@ -41,6 +47,7 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	Mesh1P->SetCollisionObjectType(ECC_Pawn);
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);
+	Mesh1P->SetRelativeLocation(FVector(-20, 0, -86));
 
 	GetMesh()->bOnlyOwnerSee = false;
 	GetMesh()->bOwnerNoSee = true;
@@ -351,6 +358,9 @@ void AShooterCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& 
 			}
 		}
 	}
+	
+	//If Dead in crouch
+	SetUnCrouch(); 
 
 	// cannot use IsLocallyControlled here, because even local client's controller may be NULL here
 	if (GetNetMode() != NM_DedicatedServer && DeathSound && Mesh1P && Mesh1P->IsVisible())
@@ -867,8 +877,37 @@ void AShooterCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &AShooterCharacter::OnStartRunning);
 	PlayerInputComponent->BindAction("RunToggle", IE_Pressed, this, &AShooterCharacter::OnStartRunningToggle);
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &AShooterCharacter::OnStopRunning);
+	//Crouching
+	PlayerInputComponent->BindAction("CrouchToggle", IE_Pressed, this, &AShooterCharacter::OnStartCrouching);
 }
 
+void AShooterCharacter::OnStartCrouching()
+{
+	if (!bIsCrouched)
+	{
+		Crouch();
+		USkeletalMeshComponent* DefMesh1P = Cast<USkeletalMeshComponent>(GetClass()->GetDefaultSubobjectByName(TEXT("PawnMesh1P")));
+		DefMesh1P->SetRelativeLocation(FVector(-20, 0, -117.4));
+	}
+	else
+	{
+		UnCrouch();
+		USkeletalMeshComponent* DefMesh1P = Cast<USkeletalMeshComponent>(GetClass()->GetDefaultSubobjectByName(TEXT("PawnMesh1P")));
+		DefMesh1P->SetRelativeLocation(FVector(-20, 0, -86));
+	}
+}
+
+void AShooterCharacter::SetUnCrouch()
+{
+	UnCrouch();
+	USkeletalMeshComponent* DefMesh1P = Cast<USkeletalMeshComponent>(GetClass()->GetDefaultSubobjectByName(TEXT("PawnMesh1P")));
+	DefMesh1P->SetRelativeLocation(FVector(-20, 0, -86));
+}
+
+bool AShooterCharacter::IsCrouching() const
+{
+	return bIsCrouched;
+}
 
 void AShooterCharacter::MoveForward(float Val)
 {
@@ -999,6 +1038,10 @@ void AShooterCharacter::OnStartRunning()
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
 	if (MyPC && MyPC->IsGameInputAllowed())
 	{
+		if (bIsCrouched)
+		{
+			SetUnCrouch();
+		}
 		if (IsTargeting())
 		{
 			SetTargeting(false);
@@ -1013,6 +1056,10 @@ void AShooterCharacter::OnStartRunningToggle()
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
 	if (MyPC && MyPC->IsGameInputAllowed())
 	{
+		if (bIsCrouched)
+		{
+			SetUnCrouch();
+		}
 		if (IsTargeting())
 		{
 			SetTargeting(false);
