@@ -30,7 +30,8 @@ FAutoConsoleVariableRef CVarNetEnablePauseRelevancy(
 void AShooterCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EEndPlayReason::Destroyed);
-	SetUnCrouch();
+	if (IsControlled()) 
+		SetUnCrouch();
 }
 
 AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer)
@@ -356,11 +357,12 @@ void AShooterCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& 
 			{
 				PC->ClientPlayForceFeedback(DamageType->KilledForceFeedback, false, false, "Damage");
 			}
+			if (bIsCrouched) 	//If Dead in crouch
+			{
+				SetUnCrouch();
+			}
 		}
 	}
-	
-	//If Dead in crouch
-	SetUnCrouch(); 
 
 	// cannot use IsLocallyControlled here, because even local client's controller may be NULL here
 	if (GetNetMode() != NM_DedicatedServer && DeathSound && Mesh1P && Mesh1P->IsVisible())

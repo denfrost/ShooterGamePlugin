@@ -33,6 +33,7 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDMainTextureOb(TEXT("/ShooterGame/UI/HUD/HUDMain"));
 	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDAssets02TextureOb(TEXT("/ShooterGame/UI/HUD/HUDAssets02"));
 	static ConstructorHelpers::FObjectFinder<UTexture2D> LowHealthOverlayTextureOb(TEXT("/ShooterGame/UI/HUD/LowHealthOverlay"));
+	static ConstructorHelpers::FObjectFinder<UTexture2D> DialogNotifyTextureOb(TEXT("/ShooterGame/UI/HUD/dialogue"));
 
 	// Fonts are not included in dedicated server builds.
 	#if !UE_SERVER
@@ -44,6 +45,7 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	}
 	#endif //!UE_SERVER
 
+	DialogNotifyTexture = DialogNotifyTextureOb.Object;
 	HitNotifyTexture = HitTextureOb.Object;
 	HUDMainTexture = HUDMainTextureOb.Object;
 	HUDAssets02Texture = HUDAssets02TextureOb.Object;

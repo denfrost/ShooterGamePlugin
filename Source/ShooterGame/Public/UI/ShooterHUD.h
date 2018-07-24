@@ -252,7 +252,11 @@ protected:
 
 	/** Offsets to display hit indicator parts. */
 	FVector2D Offsets[8];
-
+	
+	/** Texture for hit indicator. */
+	UPROPERTY()
+	UTexture2D* DialogNotifyTexture;
+	
 	/** Texture for hit indicator. */
 	UPROPERTY()
 	UTexture2D* HitNotifyTexture;
